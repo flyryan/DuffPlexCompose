@@ -283,6 +283,47 @@ This stack uses Mullvad VPN to protect your privacy. Here's how to set it up:
      SERVER_CITIES: los_angeles # Use lowercase with underscores, e.g., new_york, london, tokyo
      ```
 
+### Launch and Initial Setup
+
+1. **Start the Stack**:
+   ```bash
+   # Create required directories
+   mkdir -p {plex,radarr,sonarr,overseerr,tautulli,jackett,sabnzbd,organizr,monitorr,netdata,speedtest-tracker,qbt}/config backup
+
+   # Start all services
+   docker-compose up -d
+   ```
+
+2. **Verify Services**:
+   ```bash
+   # Check if all containers are running
+   docker-compose ps
+
+   # View logs for any issues
+   docker-compose logs
+   ```
+
+3. **Initial Security Setup**:
+   - Get qBittorrent's temporary password:
+     ```bash
+     docker-compose logs qbittorrent
+     ```
+   - Set secure passwords for all services
+   - Configure authentication for Radarr, Sonarr, and other services
+
+4. **Post-Launch Configuration**:
+   - Configure Plex libraries and media paths
+   - Set up Radarr/Sonarr quality profiles
+   - Configure Jackett indexers
+   - Test VPN connectivity through Gluetun
+   - Verify all services can communicate with each other
+
+5. **Backup Configuration**:
+   ```bash
+   # Backup all config directories
+   tar -czf backup/config_backup_$(date +%Y%m%d).tar.gz */config
+   ```
+
 [🔝 Back to top](#table-of-contents)
 
 ---
