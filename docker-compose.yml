@@ -123,7 +123,7 @@ services:
       - TZ=America/New_York
     volumes:
       - ./qbt/config:/config
-      - ./test/downloads:/downloads
+      - /path/to/downloads:/downloads  # Replace with your downloads directory path
     # Install RAR support and configure auto-extract
     command: >
       /bin/sh -c "
@@ -166,8 +166,8 @@ services:
     #  - /dev/dri:/dev/dri  # GPU passthrough (remove if not using GPU transcoding)
     volumes:
       - ./plex/config:/config
-      - ./test/media/movies:/media/movies
-      - ./test/media/tv:/media/tv
+      - /path/to/media/movies:/media/movies  # Replace with your movies directory path
+      - /path/to/media/tv:/media/tv  # Replace with your TV shows directory path
     ports:
       - 32400:32400
     restart: unless-stopped
@@ -184,8 +184,8 @@ services:
       - TZ=America/New_York
     volumes:
       - ./radarr/config:/config
-      - ./test/media/movies:/movies
-      - ./test/downloads:/downloads
+      - /path/to/media/movies:/movies  # Replace with your movies directory path
+      - /path/to/downloads:/downloads  # Replace with your downloads directory path
     ports:
       - 7878:7878
     restart: unless-stopped
@@ -202,8 +202,8 @@ services:
       - TZ=America/New_York
     volumes:
       - ./sonarr/config:/config
-      - ./test/media/tv:/tv
-      - ./test/downloads:/downloads
+      - /path/to/media/tv:/tv  # Replace with your TV shows directory path
+      - /path/to/downloads:/downloads  # Replace with your downloads directory path
     ports:
       - 8989:8989
     restart: unless-stopped
@@ -253,7 +253,7 @@ services:
       - AUTO_UPDATE=true
     volumes:
       - ./jackett/config:/config
-      - ./test/downloads:/downloads
+      - /path/to/downloads:/downloads  # Replace with your downloads directory path
     ports:
       - 9117:9117
     restart: unless-stopped
@@ -270,7 +270,7 @@ services:
       - TZ=America/New_York
     volumes:
       - ./sabnzbd/config:/config
-      - ./test/downloads:/downloads
+      - /path/to/downloads:/downloads  # Replace with your downloads directory path
     ports:
       - 8081:8080
     restart: unless-stopped
