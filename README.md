@@ -38,6 +38,12 @@ A complete media server solution built on Docker technology. This stack provides
   - [Overseerr](#overseerr-port-5055)
   - [Jackett](#jackett-port-9117)
   - [SABnzbd](#sabnzbd-port-8081)
+  - [Tautulli](#tautulli-port-8181)
+  - [Organizr](#organizr-port-8096)
+  - [Monitorr](#monitorr-port-8097)
+  - [Netdata](#netdata-port-19999)
+  - [OpenSpeedTest](#openspeedtest-port-3000)
+  - [SpeedTest-Tracker](#speedtest-tracker-port-8765)
 - [How Everything Works Together](#how-everything-works-together)
 - [Port Reference](#port-reference)
 - [Updating](#updating)
@@ -443,6 +449,69 @@ If you choose not to use VPN:
    - Completed: `/downloads/complete`
 4. Add news servers
 5. Set up categories for Radarr/Sonarr
+
+### Tautulli (Port 8181)
+
+1. Access Tautulli at `http://localhost:8181`
+2. Connect to your Plex server
+3. Configure notification agents (optional)
+4. Set up monitoring preferences
+5. Enable statistics collection
+
+### Organizr (Port 8096)
+
+1. Access Organizr at `http://localhost:8096`
+2. Complete initial setup wizard
+3. Add your media services as tabs:
+   - Plex
+   - Radarr
+   - Sonarr
+   - Overseerr
+   - Other services
+4. Configure authentication (recommended)
+5. Customize dashboard layout
+
+### Monitorr (Port 8097)
+
+1. Access Monitorr at `http://localhost:8097`
+2. Add your services for monitoring:
+   - Plex
+   - Radarr
+   - Sonarr
+   - Other critical services
+3. Configure refresh intervals
+4. Set up notifications (optional)
+
+### Netdata (Port 19999)
+
+1. Access Netdata at `http://localhost:19999`
+2. View real-time system metrics:
+   - CPU usage
+   - Memory usage
+   - Disk I/O
+   - Network traffic
+3. Configure alert notifications (optional)
+4. Set up custom dashboards (optional)
+
+### OpenSpeedTest (Port 3000)
+
+1. Access OpenSpeedTest at `http://localhost:3000`
+2. Run speed tests to measure:
+   - Download speed
+   - Upload speed
+   - Latency
+3. No additional configuration required
+
+### SpeedTest-Tracker (Port 8765)
+
+1. Access SpeedTest-Tracker at `http://localhost:8765`
+2. Login with default credentials (if AUTH=true):
+   - Create your admin account on first login
+3. Configure test schedule:
+   - Set automatic test intervals
+   - Choose preferred speedtest servers
+4. Set up notifications (optional)
+5. View historical speed test data
 
 ## Port Reference
 
