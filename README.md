@@ -384,13 +384,9 @@ If you choose not to use VPN:
    - CentOS/RHEL: `sudo yum install pv`
    - macOS: `brew install pv`
 
-   Then use this alternative command with progress bar:
+   Then use this alternative command with progress bar showing total size and time remaining:
    ```bash
-   tar -czf - \
-     --exclude='plex/config/Library/Application Support/Plex Media Server/Media' \
-     --exclude='plex/config/Library/Application Support/Plex Media Server/Cache' \
-     --exclude='plex/config/Library/Application Support/Plex Media Server/Metadata' \
-     */config 2>/dev/null | pv > backup/config_backup_$(date +%Y%m%d).tar.gz
+   tar -czf - --exclude='plex/config/Library/Application Support/Plex Media Server/Media' --exclude='plex/config/Library/Application Support/Plex Media Server/Cache' --exclude='plex/config/Library/Application Support/Plex Media Server/Metadata' */config 2>/dev/null | pv -s $(tar -cf - --exclude='plex/config/Library/Application Support/Plex Media Server/Media' --exclude='plex/config/Library/Application Support/Plex Media Server/Cache' --exclude='plex/config/Library/Application Support/Plex Media Server/Metadata' */config 2>/dev/null | wc -c) > backup/config_backup_$(date +%Y%m%d).tar.gz
    ```
 
 [🔝 Back to top](#table-of-contents)
