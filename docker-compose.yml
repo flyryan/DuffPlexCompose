@@ -71,7 +71,7 @@
 #    - View the full list at: https://github.com/qdm12/gluetun-wiki/blob/main/setup/servers.md#list-of-vpn-servers
 #    - Choose one or more cities (comma-separated)
 #    - A random server will be chosen from your list each time the container starts
-#    Example cities: "Stockholm,London,New York NY,Los Angeles CA"
+#    Example cities: "Ashburn VA,Atlanta GA,Chicago IL,Dallas TX"
 
 version: "3.8"
 services:
@@ -95,9 +95,9 @@ services:
     environment:
       - VPN_SERVICE_PROVIDER=mullvad
       - VPN_TYPE=wireguard
-      - WIREGUARD_PRIVATE_KEY=EOw3bXwBtVgVk7I4Mi+A/E13EuQxZDdXVm4fRzY3C38=
-      - WIREGUARD_ADDRESSES=10.73.120.96/32
-      - SERVER_CITIES=Ashburn VA
+      - WIREGUARD_PRIVATE_KEY=your_private_key_here  # Replace with your WireGuard private key
+      - WIREGUARD_ADDRESSES=your_wireguard_address_here  # Replace with your WireGuard address (e.g., 10.x.x.x/32)
+      - SERVER_CITIES=Ashburn VA  # Format: "City State" for US cities, just "City" for international
       - SOCKSPROXY=on
       - HTTPPROXY=on
       - TZ=America/New_York
