@@ -363,3 +363,11 @@ While some minor documentation improvements are recommended, no critical issues 
 5. Clarify VPN city format requirements
 
 The validation process has provided valuable insights for improving user experience while confirming the overall reliability and security of the stack.
+
+### Update (December 30th, 2024)
+All previously identified documentation improvements have been addressed in this validation report, including:
+- PUID/PGID requirements and retrieval process clarification
+- Platform compatibility notes for ARM64 systems
+- Backup directory inclusion in setup steps
+- Timezone command examples with admin access notes
+- VPN city format requirements
