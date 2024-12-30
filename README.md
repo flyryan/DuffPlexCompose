@@ -366,15 +366,18 @@ If you choose not to use VPN:
 
 5. **Backup Configuration**:
    ```bash
-   # Create backup directory and backup all config directories
+   # Create backup directory
    mkdir -p backup
+   ```
+   ```bash
+   # Backup all config directories (with progress bar)
    tar -czf - */config | pv -s $(du -sb */config | awk '{sum+=$1} END {print sum}') > backup/config_backup_$(date +%Y%m%d).tar.gz
    ```
    Note: If pv is not installed, you can install it with:
    - Ubuntu/Debian: `sudo apt-get install pv`
    - CentOS/RHEL: `sudo yum install pv`
    - macOS: `brew install pv`
-   
+
    Or use tar's verbose flag instead: `tar -czvf backup/config_backup_$(date +%Y%m%d).tar.gz */config`
 
 [🔝 Back to top](#table-of-contents)
