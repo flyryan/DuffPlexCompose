@@ -89,15 +89,12 @@ services:
     environment:
       - VPN_SERVICE_PROVIDER=mullvad
       - VPN_TYPE=wireguard
-      # Replace with your WireGuard private key from Mullvad configuration
-      - WIREGUARD_PRIVATE_KEY=your_private_key_here
-      # Replace with your WireGuard address from Mullvad configuration
-      - WIREGUARD_ADDRESSES=your_wireguard_address_here
-      # Replace with your chosen city/cities from the Mullvad cities list
-      - SERVER_CITIES=your_chosen_city
+      - WIREGUARD_PRIVATE_KEY=EOw3bXwBtVgVk7I4Mi+A/E13EuQxZDdXVm4fRzY3C38=
+      - WIREGUARD_ADDRESSES=10.73.120.96/32
+      - SERVER_CITIES=Ashburn VA
       - SOCKSPROXY=on
       - HTTPPROXY=on
-      - TZ=Etc/UTC
+      - TZ=America/New_York
     ports:
       - 8888:8888   # HTTP proxy
       - 8080:8080   # qBittorrent Web UI
@@ -112,12 +109,12 @@ services:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
     environment:
-      - PUID=1000  # Replace with your user ID
-      - PGID=1000  # Replace with your group ID
-      - TZ=Etc/UTC # Replace with your timezone
+      - PUID=501  # User ID
+      - PGID=20   # Group ID
+      - TZ=America/New_York
     volumes:
       - ./qbt/config:/config
-      - /path/to/downloads:/downloads # Replace with your downloads path
+      - ./test/downloads:/downloads
     # Install RAR support and configure auto-extract
     command: >
       /bin/sh -c "
@@ -144,18 +141,19 @@ services:
     container_name: plex
     network_mode: bridge
     environment:
-      - PUID=1000  # Replace with your user ID
-      - PGID=1000  # Replace with your group ID
+      - PUID=501
+      - PGID=20
+      - TZ=America/New_York
       - VERSION=docker
       # Optional: Remove if not using GPU transcoding
-      - NVIDIA_VISIBLE_DEVICES=all
-      - NVIDIA_DRIVER_CAPABILITIES=computevideoutility
-    devices:
-      - /dev/dri:/dev/dri  # GPU passthrough (remove if not using GPU transcoding)
+    #  - NVIDIA_VISIBLE_DEVICES=all####i#######
+    #  - NVIDIA_DRIVER_CAPABILITIES=computevideoutility
+    # devices:
+    #  - /dev/dri:/dev/dri  # GPU passthrough (remove if not using GPU transcoding)
     volumes:
       - ./plex/config:/config
-      - /path/to/movies:/media/movies  # Replace with your movies path
-      - /path/to/tv:/media/tv         # Replace with your TV shows path
+      - ./test/media/movies:/media/movies
+      - ./test/media/tv:/media/tv
     ports:
       - 32400:32400
     restart: unless-stopped
@@ -167,12 +165,13 @@ services:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
     environment:
-      - PUID=1000  # Replace with your user ID
-      - PGID=1000  # Replace with your group ID
+      - PUID=501
+      - PGID=20
+      - TZ=America/New_York
     volumes:
       - ./radarr/config:/config
-      - /path/to/movies:/movies       # Replace with your movies path
-      - /path/to/downloads:/downloads # Replace with your downloads path
+      - ./test/media/movies:/movies
+      - ./test/downloads:/downloads
     ports:
       - 7878:7878
     restart: unless-stopped
@@ -184,12 +183,13 @@ services:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
     environment:
-      - PUID=1000  # Replace with your user ID
-      - PGID=1000  # Replace with your group ID
+      - PUID=501
+      - PGID=20
+      - TZ=America/New_York
     volumes:
       - ./sonarr/config:/config
-      - /path/to/tv:/tv               # Replace with your TV shows path
-      - /path/to/downloads:/downloads # Replace with your downloads path
+      - ./test/media/tv:/tv
+      - ./test/downloads:/downloads
     ports:
       - 8989:8989
     restart: unless-stopped
@@ -201,9 +201,9 @@ services:
     image: lscr.io/linuxserver/overseerr:latest
     container_name: overseerr
     environment:
-      - PUID=1000  # Replace with your user ID
-      - PGID=1000  # Replace with your group ID
-      - TZ=Etc/UTC # Replace with your timezone
+      - PUID=501
+      - PGID=20
+      - TZ=America/New_York
     volumes:
       - ./overseerr/config:/config
     ports:
@@ -217,9 +217,9 @@ services:
     image: lscr.io/linuxserver/tautulli:latest
     container_name: tautulli
     environment:
-      - PUID=1000  # Replace with your user ID
-      - PGID=1000  # Replace with your group ID
-      - TZ=Etc/UTC # Replace with your timezone
+      - PUID=501
+      - PGID=20
+      - TZ=America/New_York
     volumes:
       - ./tautulli/config:/config
     ports:
@@ -233,13 +233,13 @@ services:
     image: lscr.io/linuxserver/jackett:latest
     container_name: jackett
     environment:
-      - PUID=1000  # Replace with your user ID
-      - PGID=1000  # Replace with your group ID
-      - TZ=Etc/UTC # Replace with your timezone
+      - PUID=501
+      - PGID=20
+      - TZ=America/New_York
       - AUTO_UPDATE=true
     volumes:
       - ./jackett/config:/config
-      - /path/to/downloads:/downloads # Replace with your downloads path
+      - ./test/downloads:/downloads
     ports:
       - 9117:9117
     restart: unless-stopped
@@ -251,12 +251,12 @@ services:
     image: lscr.io/linuxserver/sabnzbd:latest
     container_name: sabnzbd
     environment:
-      - PUID=1000  # Replace with your user ID
-      - PGID=1000  # Replace with your group ID
-      - TZ=Etc/UTC # Replace with your timezone
+      - PUID=501
+      - PGID=20
+      - TZ=America/New_York
     volumes:
       - ./sabnzbd/config:/config
-      - /path/to/downloads:/downloads # Replace with your downloads path
+      - ./test/downloads:/downloads
     ports:
       - 8081:8080
     restart: unless-stopped
@@ -268,9 +268,9 @@ services:
     image: organizr/organizr:latest
     container_name: organizr
     environment:
-      - PUID=1000  # Replace with your user ID
-      - PGID=1000  # Replace with your group ID
-      - TZ=Etc/UTC # Replace with your timezone
+      - PUID=501
+      - PGID=20
+      - TZ=America/New_York
     volumes:
       - ./organizr/config:/config
     ports:
@@ -280,19 +280,15 @@ services:
   # System Monitoring
   # ---------------
   # Service and system resource monitoring
-  monitozr:
+  monitorr:
     image: monitorr/monitorr:latest
     container_name: monitorr
     environment:
-      - PUID=1000  # Replace with your user ID
-      - PGID=1000  # Replace with your group ID
-      - TZ=Etc/UTC # Replace with your timezone
+      - PUID=501
+      - PGID=20
+      - TZ=America/New_York
     volumes:
       - ./monitorr/app:/app
-      - /path/to/media:/mnt/media:ro     # Replace with your media path
-      - /path/to/downloads:/mnt/downloads:ro # Replace with your downloads path
-      - /path/to/backup:/mnt/backup:ro   # Replace with your backup path
-      - /:/mnt/root:ro
     ports:
       - 8097:80
     restart: unless-stopped
@@ -342,9 +338,9 @@ services:
     volumes:
       - ./speedtest-tracker/config:/config
     environment:
-      - TZ=Etc/UTC     # Replace with your timezone
-      - PGID=1000      # Replace with your group ID
-      - PUID=1000      # Replace with your user ID
+      - TZ=America/New_York
+      - PGID=20
+      - PUID=501
       - AUTH=true
       - OOKLA_EULA_GDPR=true
     logging:
