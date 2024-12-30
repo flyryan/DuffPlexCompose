@@ -2,53 +2,53 @@
 
 A complete media server solution built on Docker technology. This stack provides everything you need to download, organize, and stream your media collection, all running in containers for easy setup and management.
 
-## Quick Links
+## Quick Navigation
 - [Quick Start](#quick-start)
 - [Architecture Overview](#architecture-overview)
 - [Configuration](#configuration)
-- [Service Configuration](#service-configuration-guide)
+- [Service Setup](#service-configuration-guide)
 - [Port Reference](#port-reference)
 - [Troubleshooting](#troubleshooting)
 
 ## Table of Contents
 
-1. [What is Docker?](#what-is-docker)
-2. [Why Docker?](#why-docker)
-3. [Quick Start](#quick-start)
-4. [Architecture Overview](#architecture-overview)
-   - [Core Components](#core-components)
-     - [Media Management Layer](#media-management-layer)
-     - [Request & Discovery System](#request--discovery-system)
-     - [Automated Media Acquisition](#automated-media-acquisition)
-     - [Download Management](#download-management)
-     - [Search & Indexing](#search--indexing)
-   - [Monitoring & Management](#monitoring--management)
-   - [Data Flow](#data-flow)
-   - [Security Considerations](#security-considerations)
-   - [Integration Points](#integration-points)
-5. [Detailed Setup Guide](#detailed-setup-guide)
-   - [Prerequisites](#prerequisites)
-   - [VPN Setup](#vpn-setup)
-   - [Configuration](#configuration)
-6. [Service Configuration Guide](#service-configuration-guide)
-   - [qBittorrent](#qbittorrent-port-8080)
-   - [Plex](#plex-port-32400)
-   - [Radarr](#radarr-port-7878)
-   - [Sonarr](#sonarr-port-8989)
-   - [Overseerr](#overseerr-port-5055)
-   - [Jackett](#jackett-port-9117)
-   - [SABnzbd](#sabnzbd-port-8081)
-7. [How Everything Works Together](#how-everything-works-together)
-8. [Port Reference](#port-reference)
-9. [Updating](#updating)
-10. [Notes](#notes)
-11. [Troubleshooting](#troubleshooting)
+- [What is Docker?](#what-is-docker)
+- [Why Docker?](#why-docker)
+- [Quick Start](#quick-start)
+- [Architecture Overview](#architecture-overview)
+  - [Core Components](#core-components)
+    - [Media Management Layer](#media-management-layer)
+    - [Request & Discovery System](#request--discovery-system)
+    - [Automated Media Acquisition](#automated-media-acquisition)
+    - [Download Management](#download-management)
+    - [Search & Indexing](#search--indexing)
+  - [Monitoring & Management](#monitoring--management)
+  - [Data Flow](#data-flow)
+  - [Security Considerations](#security-considerations)
+  - [Integration Points](#integration-points)
+- [Detailed Setup Guide](#detailed-setup-guide)
+  - [Prerequisites](#prerequisites)
+  - [VPN Setup](#vpn-setup)
+  - [Configuration](#configuration)
+- [Service Configuration Guide](#service-configuration-guide)
+  - [qBittorrent](#qbittorrent-port-8080)
+  - [Plex](#plex-port-32400)
+  - [Radarr](#radarr-port-7878)
+  - [Sonarr](#sonarr-port-8989)
+  - [Overseerr](#overseerr-port-5055)
+  - [Jackett](#jackett-port-9117)
+  - [SABnzbd](#sabnzbd-port-8081)
+- [How Everything Works Together](#how-everything-works-together)
+- [Port Reference](#port-reference)
+- [Updating](#updating)
+- [Notes](#notes)
+- [Troubleshooting](#troubleshooting)
 
-## 1. What is Docker?
+## What is Docker?
 
 Docker is a platform that makes it easy to run applications in isolated containers. Think of containers as lightweight, standalone packages that include everything needed to run a piece of software.
 
-## 2. Why Docker?
+## Why Docker?
 
 - **Easy Setup**: No need to manually install each application
 - **No Conflicts**: Each service runs in its own container, preventing conflicts
@@ -62,7 +62,7 @@ This stack uses Docker Compose, a tool that helps you run multiple Docker contai
 
 ---
 
-## 3. Quick Start
+## Quick Start
 
 1. Install Docker and Docker Compose
 2. Clone this repository:
@@ -87,7 +87,7 @@ That's it! Your media server is now running. Continue reading for detailed setup
 
 ---
 
-## 4. Architecture Overview
+## Architecture Overview
 
 The media server stack is built with a microservices architecture where each component runs in its own Docker container, working together to provide a complete media management and streaming solution. Here's how everything fits together:
 
@@ -218,7 +218,7 @@ The media server stack is built with a microservices architecture where each com
 
 ---
 
-## 5. Detailed Setup Guide
+## Detailed Setup Guide
 
 ### Prerequisites
 
@@ -277,7 +277,7 @@ This stack uses Mullvad VPN to protect your privacy. Here's how to set it up:
      SERVER_CITIES: your_chosen_city
      ```
 
-## 6. Service Configuration Guide
+## Service Configuration Guide
 
 After starting the stack, configure each service in this order:
 
@@ -337,7 +337,7 @@ After starting the stack, configure each service in this order:
 2. Follow setup wizard
 3. Add your Usenet provider details
 
-## 7. How Everything Works Together
+## How Everything Works Together
 
 1. **Media Request Flow**:
    - Users request media through Overseerr
@@ -358,7 +358,7 @@ After starting the stack, configure each service in this order:
    - System monitoring tracks performance
    - Speed tests monitor network health
 
-## 8. Port Reference
+## Port Reference
 
 | Service          | Port  | Purpose                            |
 |-----------------|-------|-----------------------------------|
@@ -375,7 +375,7 @@ After starting the stack, configure each service in this order:
 | OpenSpeedTest   | 3000  | Network testing (HTTP)           |
 | SpeedTest Track | 8765  | Speed monitoring                 |
 
-## 9. Updating
+## Updating
 
 To update all services to their latest versions:
 
@@ -393,14 +393,14 @@ Your configuration and data will be preserved during updates.
 
 ---
 
-## 10. Notes
+## Notes
 
 - GPU transcoding is enabled by default for Plex. Remove GPU-related settings if not using.
 - All services auto-start when Docker starts
 - Service configurations persist in their respective config directories
 - Regular backups of config directories recommended
 
-## 11. Troubleshooting
+## Troubleshooting
 
 1. **VPN Issues**:
    - Check Mullvad status at `http://localhost:8888`
