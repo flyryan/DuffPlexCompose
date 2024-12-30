@@ -87,8 +87,15 @@ Transform the current static docker-compose setup into an interactive wizard tha
 ### 4. Technical Implementation
 
 1. **Wizard Core**
-   - Python-based CLI application
-   - Interactive prompts using `questionary`
+   - Primary: Electron-based GUI application
+     - Cross-platform desktop interface
+     - Directory browsing with file picker dialogs
+     - Visual service selection with checkboxes
+     - Real-time validation feedback
+   - Fallback: Python-based CLI application
+     - Interactive prompts using `questionary`
+     - Support for non-GUI environments
+   - Shared backend logic for both interfaces
    - YAML/JSON configuration generation
    - Service template management
 
@@ -131,50 +138,47 @@ Transform the current static docker-compose setup into an interactive wizard tha
 ### 5. User Interface Flow
 
 1. **Welcome & System Check**
-   ```
-   🚀 Media Server Deployment Wizard
-   ├── Checking Docker installation...
-   ├── Validating system requirements...
-   └── Detecting architecture...
-   ```
+   - System compatibility check screen
+   - Docker installation verification
+   - Architecture detection
+   - Disk space analysis
+   - Required ports check
 
 2. **Directory Configuration**
-   ```
-   📁 Directory Setup
-   ├── Media location: [input]
-   ├── Downloads location: [input]
-   ├── Backup location: [input]
-   └── Validating permissions...
-   ```
+   - Visual directory structure view
+   - Browse button for each path selection
+   - Directory creation option if not exists
+   - Permission status indicators
+   - Real-time path validation
+   - Suggested default locations
+   - "Save for later" option to skip immediate path selection
 
 3. **Service Selection**
-   ```
-   🔧 Service Selection
-   ├── Core Services
-   │   └── [Required selections]
-   ├── Media Management
-   │   └── [Choose alternatives]
-   └── Optional Services
-       └── [Multiple selection]
-   ```
+   - Visual grid/card layout of available services
+   - Grouped by category with clear descriptions
+   - Checkbox selection for optional services
+   - Radio buttons for alternative choices
+   - Service dependency visualization
+   - Resource requirement indicators
+   - Hover tooltips with service details
 
 4. **Configuration**
-   ```
-   ⚙️ Service Configuration
-   ├── VPN Setup
-   ├── Media Server Options
-   ├── Download Client Settings
-   └── Integration Configuration
-   ```
+   - Tab-based configuration interface
+   - Visual form elements for settings
+   - Port selection with conflict detection
+   - VPN provider selection dropdown
+   - Hardware acceleration options
+   - Integration setup wizards
+   - Configuration templates
+   - Advanced settings toggle
 
 5. **Deployment**
-   ```
-   📦 Deployment
-   ├── Generating docker-compose.yml
-   ├── Creating directories
-   ├── Starting services
-   └── Validating deployment
-   ```
+   - Visual deployment progress
+   - Service startup status indicators
+   - Real-time log viewer
+   - Error notifications with solutions
+   - Success confirmations
+   - Quick access links to services
 
 ### 6. Error Handling & Recovery
 
@@ -217,10 +221,11 @@ Transform the current static docker-compose setup into an interactive wizard tha
 ## Implementation Phases
 
 ### Phase 1: Core Framework
-1. Basic CLI wizard structure
-2. Directory management
-3. Simple service selection
+1. Basic GUI application structure
+2. Visual directory management
+3. Service selection interface
 4. Basic docker-compose generation
+5. CLI fallback implementation
 
 ### Phase 2: Service Integration
 1. Alternative service support
