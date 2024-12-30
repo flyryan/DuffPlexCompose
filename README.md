@@ -389,6 +389,36 @@ If you choose not to use VPN:
    tar -czf - --exclude='plex/config/Library/Application Support/Plex Media Server/Media' --exclude='plex/config/Library/Application Support/Plex Media Server/Cache' --exclude='plex/config/Library/Application Support/Plex Media Server/Metadata' */config 2>/dev/null | pv -s $(tar -cf - --exclude='plex/config/Library/Application Support/Plex Media Server/Media' --exclude='plex/config/Library/Application Support/Plex Media Server/Cache' --exclude='plex/config/Library/Application Support/Plex Media Server/Metadata' */config 2>/dev/null | wc -c) > backup/config_backup_$(date +%Y%m%d).tar.gz
    ```
 
+6. **Restore Configuration**:
+
+   To restore from a backup:
+   ```bash
+   # Stop all services first
+   docker-compose down
+
+   # Remove existing config directories (optional, but prevents conflicts)
+   rm -rf */config
+
+   # Restore from backup (with progress bar)
+   pv backup/config_backup_YYYYMMDD.tar.gz | tar -xzf - -C .
+   ```
+   
+   Or without progress bar:
+   ```bash
+   tar -xzf backup/config_backup_YYYYMMDD.tar.gz -C .
+   ```
+
+   After restoring:
+   ```bash
+   # Fix permissions if needed
+   chown -R $PUID:$PGID */config
+
+   # Start all services
+   docker-compose up -d
+   ```
+
+   Note: Replace YYYYMMDD with your backup file's date.
+
 [🔝 Back to top](#table-of-contents)
 
 ---
