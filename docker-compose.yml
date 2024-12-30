@@ -1,0 +1,348 @@
+***REMOVED*** - Port Mappings
+# ----------------------------------------
+# Service          | Port  | Purpose
+# -----------------|-------|----------------------------------
+# Gluetun         | 8888  | HTTP proxy for VPN tunnel
+# qBittorrent     | 8080  | Web UI (via Gluetun)
+#                 | 8999  | Incoming connections (via Gluetun)
+#                 | 9000  | UDP (via Gluetun)
+# Plex            | 32400 | Plex Media Server
+# Radarr          | 7878  | Movie management
+# Sonarr          | 8989  | TV Show management
+# Overseerr       | 5055  | Media request management
+# Tautulli        | 8181  | Plex statistics and monitoring
+# Jackett         | 9117  | Torrent tracker proxy
+# SABnzbd         | 8081  | Usenet downloader
+# Organizr        | 8096  | Web-based dashboard
+# Monitorr        | 8097  | Service status monitoring
+# OpenSpeedTest   | 3000  | Speed test (HTTP)
+#                 | 3001  | Speed test (HTTPS)
+# SpeedTest Track | 8765  | Speed test monitoring
+
+# SETUP INSTRUCTIONS
+# -----------------
+# 1. Replace all PUID/PGID values with your user/group IDs
+#    Find these by running: id -u (for PUID) and id -g (for PGID)
+#
+# 2. Replace all timezone (TZ) values with your local timezone
+#    Format: Region/City (e.g., America/New_York, Europe/London)
+#    List: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+#
+# 3. Replace all path placeholders with your actual paths:
+#    - /path/to/movies: Where your movies are stored
+#    - /path/to/tv: Where your TV shows are stored
+#    - /path/to/downloads: Where downloads should be stored
+#    - /path/to/media: Root media directory
+#    - /path/to/backup: Backup directory
+#
+# 4. Configure Mullvad VPN (see MULLVAD VPN CONFIGURATION section below)
+#
+# 5. Optional: If not using GPU transcoding in Plex, remove the GPU-related
+#    environment variables and devices section from the plex service. 
+#    IMPORTANT: You DO need the GPU variables for Intel Quick Sync CPUs!
+#
+# 6. Create required directories:
+#    mkdir -p {plex,radarr,sonarr,overseerr,tautulli,jackett,sabnzbd,organizr,monitorr,netdata,speedtest-tracker,qbt}/config
+#
+# 7. Start the stack:
+#    docker-compose up -d
+#
+# 8. Access services through their respective ports (see port mapping table above)
+
+# MULLVAD VPN CONFIGURATION
+# ------------------------
+# 1. Sign up for Mullvad VPN at https://mullvad.net
+# 2. Generate a WireGuard configuration:
+#    - Go to https://mullvad.net/en/account/#/wireguard-config
+#    - Select "Linux" as your platform
+#    - Generate a new key
+#    - Download the configuration file
+# 3. From the configuration file, you'll need:
+#    - PrivateKey: Found in the [Interface] section
+#    - Address: Found in the [Interface] section (e.g., 10.x.x.x/32)
+# 4. For SERVER_CITIES:
+#    - View the full list at: https://github.com/qdm12/gluetun-wiki/blob/main/setup/servers.md#list-of-vpn-servers
+#    - Choose one or more cities (comma-separated)
+#    - A random server will be chosen from your list each time the container starts
+#    Example cities: "Stockholm,London,New York NY,Los Angeles CA"
+
+version: "3.8"
+services:
+  # VPN Gateway
+  # -----------
+  # Provides VPN tunnel for other containers (specifically qBittorrent)
+  # Uses Mullvad WireGuard for secure, fast connection
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    environment:
+      - VPN_SERVICE_PROVIDER=mullvad
+      - VPN_TYPE=wireguard
+      # Replace with your WireGuard private key from Mullvad configuration
+      - WIREGUARD_PRIVATE_KEY=your_private_key_here
+      # Replace with your WireGuard address from Mullvad configuration
+      - WIREGUARD_ADDRESSES=your_wireguard_address_here
+      # Replace with your chosen city/cities from the Mullvad cities list
+      - SERVER_CITIES=your_chosen_city
+      - SOCKSPROXY=on
+      - HTTPPROXY=on
+      - TZ=Etc/UTC
+    ports:
+      - 8888:8888   # HTTP proxy
+      - 8080:8080   # qBittorrent Web UI
+      - 8999:8999   # qBittorrent incoming
+      - 9000:9000/udp # qBittorrent UDP
+    restart: unless-stopped
+
+  # Torrent Client
+  # -------------
+  # qBittorrent with automatic RAR extraction, running through VPN
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=1000  # Replace with your user ID
+      - PGID=1000  # Replace with your group ID
+      - TZ=Etc/UTC # Replace with your timezone
+    volumes:
+      - ./qbt/config:/config
+      - /path/to/downloads:/downloads # Replace with your downloads path
+    # Install RAR support and configure auto-extract
+    command: >
+      /bin/sh -c "
+      apk add --no-cache gcompat curl &&
+      cd /tmp &&
+      LATEST_RAR_URL=$(curl -s https://www.rarlab.com/download.htm | grep -o 'https://www.rarlab.com/rar/rarlinux-x64-[0-9].*tar.gz' | head -1) &&
+      echo 'Downloading latest RAR from:' $${LATEST_RAR_URL} &&
+      curl -fsSL $${LATEST_RAR_URL} -o rar.tar.gz &&
+      tar xf rar.tar.gz &&
+      cp rar/rar rar/unrar /usr/local/bin/ &&
+      chmod +x /usr/local/bin/rar /usr/local/bin/unrar &&
+      rm -rf rar rar.tar.gz &&
+      mkdir -p /defaults/qBittorrent &&
+      echo -e '[AutoRun]\nenabled=true\nprogram=unrar x -y -o+ \"%R\"/*.rar' > /defaults/qBittorrent/qBittorrent.conf &&
+      /init"
+    network_mode: "service:gluetun"  # Routes all traffic through VPN
+    restart: unless-stopped
+
+  # Media Server
+  # -----------
+  # Plex Media Server with GPU acceleration support
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    container_name: plex
+    network_mode: bridge
+    environment:
+      - PUID=1000  # Replace with your user ID
+      - PGID=1000  # Replace with your group ID
+      - VERSION=docker
+      # Optional: Remove if not using GPU transcoding
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=computevideoutility
+    devices:
+      - /dev/dri:/dev/dri  # GPU passthrough (remove if not using GPU transcoding)
+    volumes:
+      - ./plex/config:/config
+      - /path/to/movies:/media/movies  # Replace with your movies path
+      - /path/to/tv:/media/tv         # Replace with your TV shows path
+    ports:
+      - 32400:32400
+    restart: unless-stopped
+
+  # Movie Management
+  # ---------------
+  # Automated movie downloading and organization
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1000  # Replace with your user ID
+      - PGID=1000  # Replace with your group ID
+    volumes:
+      - ./radarr/config:/config
+      - /path/to/movies:/movies       # Replace with your movies path
+      - /path/to/downloads:/downloads # Replace with your downloads path
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+
+  # TV Show Management
+  # -----------------
+  # Automated TV show downloading and organization
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1000  # Replace with your user ID
+      - PGID=1000  # Replace with your group ID
+    volumes:
+      - ./sonarr/config:/config
+      - /path/to/tv:/tv               # Replace with your TV shows path
+      - /path/to/downloads:/downloads # Replace with your downloads path
+    ports:
+      - 8989:8989
+    restart: unless-stopped
+
+  # Media Request System
+  # -------------------
+  # Web-based interface for users to request new movies and TV shows
+  overseerr:
+    image: lscr.io/linuxserver/overseerr:latest
+    container_name: overseerr
+    environment:
+      - PUID=1000  # Replace with your user ID
+      - PGID=1000  # Replace with your group ID
+      - TZ=Etc/UTC # Replace with your timezone
+    volumes:
+      - ./overseerr/config:/config
+    ports:
+      - 5055:5055
+    restart: unless-stopped
+
+  # Plex Monitoring
+  # --------------
+  # Statistics and analytics for Plex Media Server
+  tautulli:
+    image: lscr.io/linuxserver/tautulli:latest
+    container_name: tautulli
+    environment:
+      - PUID=1000  # Replace with your user ID
+      - PGID=1000  # Replace with your group ID
+      - TZ=Etc/UTC # Replace with your timezone
+    volumes:
+      - ./tautulli/config:/config
+    ports:
+      - 8181:8181
+    restart: unless-stopped
+
+  # Torrent Indexer
+  # --------------
+  # Proxy for accessing various torrent trackers
+  jackett:
+    image: lscr.io/linuxserver/jackett:latest
+    container_name: jackett
+    environment:
+      - PUID=1000  # Replace with your user ID
+      - PGID=1000  # Replace with your group ID
+      - TZ=Etc/UTC # Replace with your timezone
+      - AUTO_UPDATE=true
+    volumes:
+      - ./jackett/config:/config
+      - /path/to/downloads:/downloads # Replace with your downloads path
+    ports:
+      - 9117:9117
+    restart: unless-stopped
+
+  # Usenet Downloader
+  # ----------------
+  # Binary newsgroup downloader
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    environment:
+      - PUID=1000  # Replace with your user ID
+      - PGID=1000  # Replace with your group ID
+      - TZ=Etc/UTC # Replace with your timezone
+    volumes:
+      - ./sabnzbd/config:/config
+      - /path/to/downloads:/downloads # Replace with your downloads path
+    ports:
+      - 8081:8080
+    restart: unless-stopped
+
+  # Service Dashboard
+  # ---------------
+  # Web-based dashboard for organizing and accessing all services
+  organizr:
+    image: organizr/organizr:latest
+    container_name: organizr
+    environment:
+      - PUID=1000  # Replace with your user ID
+      - PGID=1000  # Replace with your group ID
+      - TZ=Etc/UTC # Replace with your timezone
+    volumes:
+      - ./organizr/config:/config
+    ports:
+      - 8096:80
+    restart: unless-stopped
+
+  # System Monitoring
+  # ---------------
+  # Service and system resource monitoring
+  monitozr:
+    image: monitorr/monitorr:latest
+    container_name: monitorr
+    environment:
+      - PUID=1000  # Replace with your user ID
+      - PGID=1000  # Replace with your group ID
+      - TZ=Etc/UTC # Replace with your timezone
+    volumes:
+      - ./monitorr/app:/app
+      - /path/to/media:/mnt/media:ro     # Replace with your media path
+      - /path/to/downloads:/mnt/downloads:ro # Replace with your downloads path
+      - /path/to/backup:/mnt/backup:ro   # Replace with your backup path
+      - /:/mnt/root:ro
+    ports:
+      - 8097:80
+    restart: unless-stopped
+
+  # System Metrics
+  # -------------
+  # Real-time system metrics and monitoring
+  netdata:
+    image: netdata/netdata:latest
+    container_name: netdata-monitor
+    hostname: netdata
+    network_mode: host
+    cap_add:
+      - SYS_PTRACE
+      - SYS_ADMIN
+    security_opt:
+      - apparmor=unconfined
+    volumes:
+      - /etc/os-release:/host/etc/os-release:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./netdata/config:/etc/netdata
+    environment:
+      - DOCKER_FROM_ENV=1
+    restart: unless-stopped
+
+  # Speed Testing
+  # ------------
+  # Network speed test server
+  openspeedtest:
+    image: openspeedtest/latest
+    container_name: openspeedtest
+    ports:
+      - 3000:3000  # HTTP
+      - 3001:3001  # HTTPS
+    restart: unless-stopped
+
+  # Speed Test Tracking
+  # -----------------
+  # Automated speed test monitoring and history
+  speedtest-tracker:
+    container_name: speedtest-tracker
+    image: henrywhitaker3/speedtest-tracker:latest
+    ports:
+      - 8765:80
+    volumes:
+      - ./speedtest-tracker/config:/config
+    environment:
+      - TZ=Etc/UTC     # Replace with your timezone
+      - PGID=1000      # Replace with your group ID
+      - PUID=1000      # Replace with your user ID
+      - AUTH=true
+      - OOKLA_EULA_GDPR=true
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "10"
+        max-size: "200k"
+    restart: unless-stopped
