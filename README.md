@@ -366,19 +366,31 @@ If you choose not to use VPN:
 
 5. **Backup Configuration**:
    ```bash
-   # Create backup directory
-   mkdir -p backup
+   # Create backup directory and ensure it exists
+   mkdir -p backup || { echo "Failed to create backup directory"; exit 1; }
+
+   # Backup all config directories (with progress bar), excluding Plex cache/transcoding data
+   tar -czf backup/config_backup_$(date +%Y%m%d).tar.gz \
+     --exclude='plex/config/Library/Application Support/Plex Media Server/Media' \
+     --exclude='plex/config/Library/Application Support/Plex Media Server/Cache' \
+     --exclude='plex/config/Library/Application Support/Plex Media Server/Metadata' \
+     */config 2>/dev/null || { echo "Backup failed"; exit 1; }
+
+   echo "Backup completed successfully"
    ```
-   ```bash
-   # Backup all config directories (with progress bar)
-   tar -czf - */config | pv -s $(du -sb */config | awk '{sum+=$1} END {print sum}') > backup/config_backup_$(date +%Y%m%d).tar.gz
-   ```
-   Note: If pv is not installed, you can install it with:
+   Note: If you want to see progress during backup, you can install and use pv:
    - Ubuntu/Debian: `sudo apt-get install pv`
    - CentOS/RHEL: `sudo yum install pv`
    - macOS: `brew install pv`
 
-   Or use tar's verbose flag instead: `tar -czvf backup/config_backup_$(date +%Y%m%d).tar.gz */config`
+   Then use this alternative command with progress bar:
+   ```bash
+   tar -czf - \
+     --exclude='plex/config/Library/Application Support/Plex Media Server/Media' \
+     --exclude='plex/config/Library/Application Support/Plex Media Server/Cache' \
+     --exclude='plex/config/Library/Application Support/Plex Media Server/Metadata' \
+     */config 2>/dev/null | pv > backup/config_backup_$(date +%Y%m%d).tar.gz
+   ```
 
 [🔝 Back to top](#table-of-contents)
 
