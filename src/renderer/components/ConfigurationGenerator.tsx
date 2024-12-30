@@ -17,7 +17,9 @@ import {
   ButtonGroup,
 } from '@chakra-ui/react';
 import { useWizard } from '../context/WizardContext';
-import yaml from 'yaml';
+import yaml, { Document } from 'yaml';
+
+type ServiceName = 'plex' | 'gluetun' | 'qbittorrent' | 'transmission' | 'radarr' | 'sonarr' | 'overseerr' | 'ombi';
 
 interface ServiceConfig {
   image: string;
@@ -87,27 +89,30 @@ const ConfigurationGenerator: React.FC = () => {
     };
 
     // Add download client
-    if (services.required.downloadClient === 'qbittorrent') {
-      config.services.qbittorrent = {
-        image: 'lscr.io/linuxserver/qbittorrent:latest',
-        container_name: 'qbittorrent',
+    if (services.required.downloadClient === 'qbittorrent' || services.required.downloadClient === 'transmission') {
+      const isQbittorrent = services.required.downloadClient === 'qbittorrent';
+      const serviceName = services.required.downloadClient;
+      
+      config.services[serviceName] = {
+        image: isQbittorrent ? 'lscr.io/linuxserver/qbittorrent:latest' : 'lscr.io/linuxserver/transmission:latest',
+        container_name: serviceName,
         network_mode: 'service:gluetun',
         environment: [
           'PUID=1000',
           'PGID=1000',
           'TZ=America/New_York',
-          'WEBUI_PORT=8080',
+          isQbittorrent ? 'WEBUI_PORT=8080' : 'TRANSMISSION_WEB_PORT=9091',
         ],
         volumes: [
-          `${directories.config}/qbittorrent:/config`,
+          `${directories.config}/${serviceName}:/config`,
           `${directories.downloads.incomplete}:/downloads/incomplete`,
           `${directories.downloads.complete}:/downloads/complete`,
         ],
         restart: 'unless-stopped',
       };
 
-      // Add RAR support if enabled
-      if (services.features?.qbtRarSupport) {
+      // Add RAR support if enabled (qbittorrent only)
+      if (isQbittorrent && services.features?.qbtRarSupport) {
         config.services.qbittorrent.command = '/bin/sh -c "apk add --no-cache gcompat curl && cd /tmp && LATEST_RAR_URL=$(curl -s https://www.rarlab.com/download.htm | grep -o \'https://www.rarlab.com/rar/rarlinux-x64-[0-9].*tar.gz\' | head -1) && echo \'Downloading latest RAR from:\' ${LATEST_RAR_URL} && curl -fsSL ${LATEST_RAR_URL} -o rar.tar.gz && tar xf rar.tar.gz && cp rar/rar rar/unrar /usr/local/bin/ && chmod +x /usr/local/bin/rar /usr/local/bin/unrar && rm -rf rar rar.tar.gz && mkdir -p /defaults/qBittorrent && echo -e \'[AutoRun]\\nenabled=true\\nprogram=unrar x -y -o+ \"%R\"/*.rar\' > /defaults/qBittorrent/qBittorrent.conf && /init"';
       }
     }
@@ -151,46 +156,86 @@ const ConfigurationGenerator: React.FC = () => {
       };
     }
 
-    if (services.optional.requestSystem === 'overseerr') {
-      config.services.overseerr = {
-        image: 'linuxserver/overseerr',
-        container_name: 'overseerr',
+    if (services.optional.requestSystem === 'overseerr' || services.optional.requestSystem === 'ombi') {
+      const serviceName = services.optional.requestSystem;
+      const isOverseerr = serviceName === 'overseerr';
+      
+      config.services[serviceName] = {
+        image: isOverseerr ? 'linuxserver/overseerr' : 'linuxserver/ombi',
+        container_name: serviceName,
         environment: [
           'PUID=1000',
           'PGID=1000',
           'TZ=America/New_York',
         ],
         volumes: [
-          `${directories.config}/overseerr:/config`,
+          `${directories.config}/${serviceName}:/config`,
         ],
-        ports: ['5055:5055'],
+        ports: [isOverseerr ? '5055:5055' : '3579:3579'],
         restart: 'unless-stopped',
       };
     }
 
-    // Convert to YAML with proper spacing
-    const doc = new yaml.Document();
-    doc.contents = config;
+    // Add comments to the configuration
+    const comments: Record<ServiceName, string> = {
+      plex: '# Plex Media Server - Organizes and streams your media library',
+      gluetun: '# Gluetun VPN Gateway - Provides VPN connectivity for containers',
+      qbittorrent: '# qBittorrent - Download client with optional RAR support',
+      transmission: '# Transmission - Lightweight download client',
+      radarr: '# Radarr - Movie collection manager and automation',
+      sonarr: '# Sonarr - TV series collection manager and automation',
+      overseerr: '# Overseerr - Media request and management system',
+      ombi: '# Ombi - Media request and user management system'
+    };
 
-    // Get the YAML string
-    let yamlStr = doc.toString({
+    // Convert to YAML with proper spacing
+    const yamlStr = yaml.stringify(config, {
       lineWidth: 0,
       indent: 2,
       minContentWidth: 0,
     });
 
-    // Add spacing between services but not within them
-    const serviceNames = Object.keys(config.services);
-    serviceNames.forEach((name, index) => {
-      if (index > 0) {
-        yamlStr = yamlStr.replace(
-          new RegExp(`(\\n\\s{2}${name}:)`, 'g'),
-          '\n$1'
-        );
-      }
-    });
+    // Post-process the YAML string
+    const lines = yamlStr.split('\n');
+    const processedLines: string[] = [];
+    let currentService: string | null = null;
 
-    return yamlStr;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      
+      // Check if this is a service definition
+      const serviceMatch = line.match(/^  ([^:]+):$/);
+      if (serviceMatch) {
+        currentService = serviceMatch[1];
+        // Add a blank line before service (except first service)
+        if (processedLines.length > 0) {
+          processedLines.push('');
+        }
+        // Add the comment for this service
+        if (currentService && Object.prototype.hasOwnProperty.call(comments, currentService)) {
+          processedLines.push(comments[currentService as ServiceName]);
+        }
+        processedLines.push(line);
+        continue;
+      }
+
+      // Special handling for qbittorrent command to keep it on one line
+      if (currentService === 'qbittorrent' && line.includes('command:')) {
+        const commandLines = [];
+        while (i < lines.length && (lines[i].startsWith('    ') || lines[i].includes('command:'))) {
+          commandLines.push(lines[i].trim());
+          i++;
+        }
+        i--;
+        processedLines.push(`    command: ${commandLines.join(' ')}`);
+        continue;
+      }
+
+      // Regular line processing
+      processedLines.push(line);
+    }
+
+    return processedLines.join('\n');
   };
 
   const handleGenerate = async () => {
@@ -217,34 +262,45 @@ const ConfigurationGenerator: React.FC = () => {
   };
 
   const validateConfig = () => {
+    if (!directories || !services) {
+      return ['Missing configuration data'];
+    }
+
     const issues = [];
 
-    if (!directories?.media.movies) {
+    // Directory validation
+    if (!directories.media.movies) {
       issues.push('Movies directory is not configured');
     }
-    if (!directories?.media.tv) {
+    if (!directories.media.tv) {
       issues.push('TV Shows directory is not configured');
     }
-    if (!directories?.downloads.complete) {
+    if (!directories.downloads.complete) {
       issues.push('Downloads directory is not configured');
     }
-    if (!directories?.config) {
+    if (!directories.config) {
       issues.push('Config directory is not configured');
     }
-    if (!services?.required.mediaServer) {
+
+    // Service validation
+    if (!services.required.mediaServer) {
       issues.push('Media server is not selected');
     }
-    if (!services?.required.vpn) {
-      issues.push('VPN gateway is not selected');
-    }
-    if (!services?.required.downloadClient) {
+    if (!services.required.downloadClient) {
       issues.push('Download client is not selected');
+    }
+
+    // VPN validation
+    if (!services.required.vpn) {
+      issues.push('VPN gateway is not selected');
+    } else if (services.required.vpn !== 'gluetun') {
+      issues.push('Only Gluetun VPN gateway is supported');
     }
 
     return issues;
   };
 
-  const validationIssues = validateConfig();
+  const validationIssues = directories && services ? validateConfig() : ['Missing configuration data'];
 
   return (
     <VStack spacing={6} align="stretch">
@@ -301,6 +357,33 @@ const ConfigurationGenerator: React.FC = () => {
           isDisabled={validationIssues.length > 0}
         >
           Save Docker Compose File
+        </Button>
+        <Button
+          colorScheme="green"
+          onClick={async () => {
+            try {
+              const config = generateDockerCompose();
+              const savedPath = await window.electronAPI.saveFile(config);
+              if (savedPath) {
+                toast({
+                  title: 'Backup created',
+                  description: `Configuration has been backed up to: ${savedPath}`,
+                  status: 'success',
+                  duration: 5000,
+                });
+              }
+            } catch (error) {
+              toast({
+                title: 'Error creating backup',
+                description: error instanceof Error ? error.message : 'Unknown error occurred',
+                status: 'error',
+                duration: 5000,
+              });
+            }
+          }}
+          isDisabled={validationIssues.length > 0}
+        >
+          Save as Backup
         </Button>
       </ButtonGroup>
     </VStack>
