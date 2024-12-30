@@ -64,7 +64,12 @@ This stack uses Docker Compose, a tool that helps you run multiple Docker contai
 
 ## Quick Start
 
-1. Install Docker and Docker Compose
+1. Install Docker and Docker Compose:
+   - [Docker Desktop for Windows](https://docs.docker.com/desktop/windows/install/)
+   - [Docker Desktop for macOS](https://docs.docker.com/desktop/mac/install/)
+   - [Docker Engine for Linux](https://docs.docker.com/engine/install/)
+   - Docker Compose is included in Docker Desktop, or for Linux see the [installation guide](https://docs.docker.com/compose/install/)
+
 2. Clone this repository:
    ```bash
    git clone https://github.com/flyryan/MediaServerCompose.git
