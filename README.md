@@ -374,6 +374,7 @@ If you choose not to use VPN:
    - Ubuntu/Debian: `sudo apt-get install pv`
    - CentOS/RHEL: `sudo yum install pv`
    - macOS: `brew install pv`
+   
    Or use tar's verbose flag instead: `tar -czvf backup/config_backup_$(date +%Y%m%d).tar.gz */config`
 
 [🔝 Back to top](#table-of-contents)
