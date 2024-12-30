@@ -283,4 +283,173 @@ This stack uses Mullvad VPN to protect your privacy. Here's how to set it up:
      SERVER_CITIES: los_angeles # Use lowercase with underscores, e.g., new_york, london, tokyo
      ```
 
-[Rest of the file remains unchanged...]
+[🔝 Back to top](#table-of-contents)
+
+---
+
+## Service Configuration Guide
+
+### qBittorrent (Port 8080)
+
+1. Access qBittorrent at `http://localhost:8080`
+2. Get the temporary password:
+   ```bash
+   docker-compose logs qbittorrent
+   ```
+3. Login with:
+   - Username: `admin`
+   - Password: (use the temporary password from logs)
+4. Set a new secure password immediately
+5. Configure download paths:
+   - Downloads: `/downloads`
+   - Completed: `/downloads/complete`
+6. Enable automatic torrent management
+
+### Plex (Port 32400)
+
+1. Access Plex at `http://localhost:32400/web`
+2. Create or sign in to your Plex account
+3. Add libraries:
+   - Movies: `/movies`
+   - TV Shows: `/tv`
+4. Configure transcoding settings
+5. Set up remote access (optional)
+
+### Radarr (Port 7878)
+
+1. Access Radarr at `http://localhost:7878`
+2. Use the password you set (never use temporary passwords)
+3. Add root folder: `/movies`
+4. Configure quality profiles
+5. Add indexers (via Jackett)
+6. Connect download clients:
+   - qBittorrent via Gluetun proxy (use the password you set in qBittorrent)
+   - SABnzbd for Usenet
+
+### Sonarr (Port 8989)
+
+1. Access Sonarr at `http://localhost:8989`
+2. Use the password you set (never use temporary passwords)
+3. Add root folder: `/tv`
+4. Configure quality profiles
+5. Add indexers (via Jackett)
+6. Connect download clients:
+   - qBittorrent via Gluetun proxy (use the password you set in qBittorrent)
+   - SABnzbd for Usenet
+
+### Overseerr (Port 5055)
+
+1. Access Overseerr at `http://localhost:5055`
+2. Connect to Plex server
+3. Link Radarr/Sonarr instances
+4. Configure user access
+5. Set up request limits
+
+### Jackett (Port 9117)
+
+1. Access Jackett at `http://localhost:9117`
+2. Add indexers
+3. Note the API key
+4. Configure proxies if needed
+5. Add to Radarr/Sonarr
+
+### SABnzbd (Port 8081)
+
+1. Access SABnzbd at `http://localhost:8081`
+2. Complete initial setup
+3. Configure download paths:
+   - Temporary: `/downloads/incomplete`
+   - Completed: `/downloads/complete`
+4. Add news servers
+5. Set up categories for Radarr/Sonarr
+
+## Port Reference
+
+| Service           | Port  | Notes                               |
+|-------------------|-------|-------------------------------------|
+| Plex              | 32400 | Media streaming                     |
+| Radarr            | 7878  | Movie management                    |
+| Sonarr            | 8989  | TV show management                  |
+| Overseerr         | 5055  | Request management                  |
+| Tautulli          | 8181  | Plex statistics                     |
+| Jackett           | 9117  | Torrent indexer                     |
+| SABnzbd           | 8081  | Usenet downloader                   |
+| qBittorrent       | 8080  | Torrent client (via VPN)            |
+| Organizr          | 8096  | Service dashboard                   |
+| Monitorr          | 8097  | Service monitoring                  |
+| Netdata           | 19999 | System metrics                      |
+| OpenSpeedTest     | 3000  | Network speed testing               |
+| SpeedTest-Tracker | 8765  | Speed test history                  |
+| Gluetun           | 8888  | VPN gateway                         |
+
+## Updating
+
+To update all containers:
+
+```bash
+docker-compose pull
+docker-compose up -d
+```
+
+To update a specific service:
+
+```bash
+docker-compose pull service_name
+docker-compose up -d service_name
+```
+
+## Notes
+
+- All services use the same PUID/PGID for consistent file permissions
+- Media paths are consistent across all services
+- VPN is required for torrent traffic
+- Backup your configurations regularly
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Permission Errors**
+   - Verify PUID/PGID settings
+   - Check directory permissions
+   - Ensure consistent ownership
+
+2. **Network Issues**
+   - Confirm ports are not in use
+   - Check VPN connectivity
+   - Verify Docker network settings
+
+3. **Container Startup Failures**
+   - Check logs: `docker-compose logs service_name`
+   - Verify configuration files
+   - Ensure required volumes exist
+
+4. **Media Not Showing**
+   - Verify file permissions
+   - Check path mappings
+   - Scan libraries in Plex
+
+### Getting Help
+
+1. Check container logs:
+   ```bash
+   docker-compose logs -f service_name
+   ```
+
+2. View all container status:
+   ```bash
+   docker-compose ps
+   ```
+
+3. Restart a service:
+   ```bash
+   docker-compose restart service_name
+   ```
+
+4. Full stack restart:
+   ```bash
+   docker-compose down
+   docker-compose up -d
+   ```
+
+[🔝 Back to top](#table-of-contents)
