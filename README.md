@@ -366,18 +366,19 @@ If you choose not to use VPN:
 
 5. **Backup Configuration**:
    ```bash
-   # Create backup directory and ensure it exists
-   mkdir -p backup || { echo "Failed to create backup directory"; exit 1; }
+   # Create backup directory
+   mkdir -p backup
+   ```
 
-   # Backup all config directories (with progress bar), excluding Plex cache/transcoding data
+   ```bash
+   # Backup all config directories, excluding Plex cache/transcoding data
    tar -czf backup/config_backup_$(date +%Y%m%d).tar.gz \
      --exclude='plex/config/Library/Application Support/Plex Media Server/Media' \
      --exclude='plex/config/Library/Application Support/Plex Media Server/Cache' \
      --exclude='plex/config/Library/Application Support/Plex Media Server/Metadata' \
-     */config 2>/dev/null || { echo "Backup failed"; exit 1; }
-
-   echo "Backup completed successfully"
+     */config 2>/dev/null
    ```
+
    Note: If you want to see progress during backup, you can install and use pv:
    - Ubuntu/Debian: `sudo apt-get install pv`
    - CentOS/RHEL: `sudo yum install pv`
