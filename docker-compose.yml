@@ -1,7 +1,14 @@
-***REMOVED*** - Port Mappings
+# Personal Media Server Stack Docker Compose File
+#
+# This file contains the configuration for a personal media server stack using Docker Compose.
+# The stack includes services for VPN, torrent client, media server, media management, media request system,
+# Plex monitoring, torrent indexer, Usenet downloader, service dashboard, system monitoring, system metrics,
+# speed testing, and speed test tracking.
+#
+# Port Mappings
 # ----------------------------------------
-# Service          | Port  | Purpose
-# -----------------|-------|----------------------------------
+# Service         | Port  | Purpose
+# ----------------|-------|----------------------------------
 # Gluetun         | 8888  | HTTP proxy for VPN tunnel
 # qBittorrent     | 8080  | Web UI (via Gluetun)
 #                 | 8999  | Incoming connections (via Gluetun)
