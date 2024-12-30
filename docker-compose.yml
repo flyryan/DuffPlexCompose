@@ -75,10 +75,16 @@
 
 version: "3.8"
 services:
-  # VPN Gateway
-  # -----------
+  # VPN Gateway (Optional but Highly Recommended)
+  # -------------------------------------------
   # Provides VPN tunnel for other containers (specifically qBittorrent)
   # Uses Mullvad WireGuard for secure, fast connection
+  # While optional, using a VPN is highly recommended for privacy and security
+  # NOTE: If you don't want to use a VPN:
+  # 1. Comment out or remove this entire 'gluetun' service block
+  # 2. In the qBittorrent service below:
+  #    - Remove the 'network_mode: "service:gluetun"' line
+  #    - Uncomment the 'ports' section
   gluetun:
     image: qmcgaw/gluetun
     container_name: gluetun
@@ -104,7 +110,10 @@ services:
 
   # Torrent Client
   # -------------
-  # qBittorrent with automatic RAR extraction, running through VPN
+  # qBittorrent with automatic RAR extraction
+  # NOTE: Choose between VPN and non-VPN configuration:
+  # For VPN: Keep network_mode: "service:gluetun" (current setup)
+  # For non-VPN: Remove network_mode line and uncomment ports section below
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
@@ -131,6 +140,11 @@ services:
       echo -e '[AutoRun]\nenabled=true\nprogram=unrar x -y -o+ \"%R\"/*.rar' > /defaults/qBittorrent/qBittorrent.conf &&
       /init"
     network_mode: "service:gluetun"  # Routes all traffic through VPN
+    # If not using VPN, remove the network_mode line above and uncomment these ports:
+    # ports:
+    #   - 8080:8080   # Web UI
+    #   - 8999:8999   # Incoming connections
+    #   - 9000:9000/udp # UDP
     restart: unless-stopped
 
   # Media Server

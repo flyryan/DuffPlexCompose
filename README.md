@@ -234,9 +234,9 @@ The media server stack is built with a microservices architecture where each com
    - Usually included with Docker Desktop (Windows/macOS)
    - [Linux installation](https://docs.docker.com/compose/install/)
 
-### VPN Setup
+### VPN Setup (Optional but Highly Recommended)
 
-This stack uses Mullvad VPN to protect your privacy. Here's how to set it up:
+This stack can optionally use Mullvad VPN to protect your privacy when downloading. While not strictly required for the stack to function, using a VPN is highly recommended for privacy and security when using torrents. Here's how to set it up:
 
 1. Sign up at [Mullvad VPN](https://mullvad.net)
 
@@ -249,6 +249,14 @@ This stack uses Mullvad VPN to protect your privacy. Here's how to set it up:
 3. From the configuration file, you'll need:
    - `PrivateKey` from the [Interface] section
    - `Address` from the [Interface] section (e.g., 10.x.x.x/32)
+
+If you choose not to use VPN:
+1. In docker-compose.yml:
+   - Remove or comment out the entire `gluetun` service block
+   - In the qBittorrent service:
+     - Remove the `network_mode: "service:gluetun"` line
+     - Uncomment the `ports` section
+2. Note: Running torrents without VPN may expose your IP address to other peers
 
 ### Configuration
 
@@ -443,7 +451,7 @@ docker-compose up -d service_name
 
 - All services use the same PUID/PGID for consistent file permissions
 - Media paths are consistent across all services
-- VPN is required for torrent traffic
+- VPN is optional but highly recommended for torrent traffic
 - Backup your configurations regularly
 
 ## Troubleshooting
