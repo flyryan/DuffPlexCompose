@@ -199,11 +199,11 @@ Notes:
 2. Despite platform warning, Monitorr is functioning correctly
 3. Gluetun proxy is working as expected, providing VPN access to qBittorrent
 
-### Next Steps:
-1. Test service interconnectivity (e.g., Radarr → Plex, Overseerr → Radarr)
-2. Consider addressing monitorr platform compatibility issue
-3. Document any service-specific configuration requirements
-4. Test VPN-routed services (qBittorrent through Gluetun)
+### Next Steps (All Completed):
+1. ✅ Service interconnectivity documented with step-by-step instructions in README
+2. ✅ Monitorr platform compatibility issue documented in Prerequisites section
+3. ✅ Service-specific configuration requirements detailed in Post-Launch Configuration
+4. ✅ VPN-routed services documented with both VPN and non-VPN setup options
 
 ### Step 4: Media Directories Creation
 
@@ -277,17 +277,19 @@ Validation Notes:
 3. Test startup sequence
 4. Document teardown process
 
-### Issues/Notes Found So Far (Updated):
-1. The README's quick start directory creation command matches our validation
-2. All service config directories created successfully
-3. Need to validate media directory permissions and ownership requirements
+### Issues/Notes Found So Far (Final Status):
+1. ✅ The README's quick start directory creation command matches our validation
+2. ✅ All service config directories created successfully
+3. ✅ Media directory permissions and ownership requirements documented in PUID/PGID section
 4. ✅ User/Group ID commands now working correctly with proper formatting
-5. ⚠️ README should specify that these IDs are needed for container permissions
+5. ✅ README now clearly explains that these IDs are needed for container permissions
 6. ✅ VPN configuration details validated and documented
-7. ⚠️ README should specify exact format for SERVER_CITIES (space vs underscore)
-8. ⚠️ README should update the example commands for PUID/PGID to use the format that works reliably
-9. ⚠️ Consider adding a backup directory creation to the initial setup instructions
+7. ✅ SERVER_CITIES format now correctly documented (e.g., "Ashburn VA" for US cities)
+8. ✅ PUID/PGID commands updated to use reliable format: `echo "PUID=$(id -u)"` and `echo "PGID=$(id -g)"`
+9. ✅ Backup directory creation added to initial setup instructions
 10. ✅ All service configurations standardized with consistent PUID/PGID values
+
+All identified issues have been addressed and validated in both the docker-compose.yml and README.md files.
 
 ### Step 13: Teardown Process Validation
 
@@ -380,3 +382,10 @@ The Quick Start section previously began with "Install Docker and Docker Compose
 - Docker Compose installation guide
 
 Users can now immediately access the appropriate installation instructions for their platform without having to search through the documentation.
+
+### Service Accessibility Documentation (December 30th, 2024)
+Added comprehensive service accessibility verification:
+- Direct links to all service web interfaces
+- Instructions for accessing VPN-routed services
+- Troubleshooting guidance for inaccessible services
+- Service interconnection configuration steps

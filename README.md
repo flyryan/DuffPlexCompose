@@ -228,7 +228,10 @@ The media server stack is built with a microservices architecture where each com
    - [macOS](https://docs.docker.com/desktop/mac/install/)
    - [Linux](https://docs.docker.com/engine/install/)
 
-   Note: For ARM64 systems (like Apple M1/M2 or Raspberry Pi), most images are compatible but some may require specific ARM64 versions. Check the docker-compose.yml for platform-specific image tags.
+   Note: For ARM64 systems (like Apple M1/M2 or Raspberry Pi):
+   - Most images are compatible but some may require specific ARM64 versions
+   - The Monitorr service currently uses an amd64 image which may have reduced performance on ARM systems
+   - Check the docker-compose.yml for platform-specific image tags
 
 2. **Install Docker Compose**
    - Usually included with Docker Desktop (Windows/macOS)
@@ -263,10 +266,14 @@ If you choose not to use VPN:
 1. **Find your user/group IDs**:
    ```bash
    # Run these commands to get your user and group IDs:
-   echo "Your PUID is: $(id -u)"
-   echo "Your PGID is: $(id -g)"
+   echo "PUID=$(id -u)"
+   echo "PGID=$(id -g)"
    ```
-   Note: These IDs are critical for proper file permissions. All services must use the same PUID/PGID values to ensure consistent access to media files. Common values are PUID=1000 and PGID=1000 for the first user created on Linux systems.
+   Note: These IDs are critical for container permissions and must be set correctly for all services to:
+   - Access and modify media files
+   - Write to configuration directories
+   - Ensure consistent file ownership across all services
+   Common values are PUID=1000 and PGID=1000 for the first user created on Linux systems.
 
 2. **Set your timezone**:
    - Find your timezone from the [TZ database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
@@ -296,7 +303,7 @@ If you choose not to use VPN:
 1. **Start the Stack**:
    ```bash
    # Create required directories
-   mkdir -p {plex,radarr,sonarr,overseerr,tautulli,jackett,sabnzbd,organizr,monitorr,netdata,speedtest-tracker,qbt}/config backup
+   mkdir -p {plex,radarr,sonarr,overseerr,tautulli,jackett,sabnzbd,organizr,monitorr,netdata,speedtest-tracker,qbt}/config backup/config
 
    # Start all services
    docker-compose up -d
@@ -309,6 +316,25 @@ If you choose not to use VPN:
 
    # View logs for any issues
    docker-compose logs
+   ```
+
+   Verify each service is accessible:
+   - Plex: http://localhost:32400/web
+   - Radarr: http://localhost:7878
+   - Sonarr: http://localhost:8989
+   - Overseerr: http://localhost:5055
+   - Tautulli: http://localhost:8181
+   - Jackett: http://localhost:9117
+   - SABnzbd: http://localhost:8081
+   - qBittorrent: http://localhost:8080 (or via VPN: http://localhost:8888/qbittorrent)
+   - Organizr: http://localhost:8096
+   - Monitorr: http://localhost:8097
+   - OpenSpeedTest: http://localhost:3000
+   - SpeedTest-Tracker: http://localhost:8765
+
+   Note: If any service is not accessible, check its logs:
+   ```bash
+   docker-compose logs service_name
    ```
 
 3. **Initial Security Setup**:
@@ -324,7 +350,13 @@ If you choose not to use VPN:
    - Set up Radarr/Sonarr quality profiles
    - Configure Jackett indexers
    - Test VPN connectivity through Gluetun
-   - Verify all services can communicate with each other
+   - Configure service interconnections:
+     1. Add Plex to Overseerr (Settings → Plex → Add Server)
+     2. Add Radarr/Sonarr to Overseerr (Settings → Radarr/Sonarr → Add Server)
+     3. Add Jackett indexers to Radarr/Sonarr (Settings → Indexers → Add → Torznab → Custom)
+     4. Add download clients to Radarr/Sonarr:
+        - qBittorrent via Gluetun (host: gluetun, port: 8080)
+        - SABnzbd (host: sabnzbd, port: 8080)
 
 5. **Backup Configuration**:
    ```bash
