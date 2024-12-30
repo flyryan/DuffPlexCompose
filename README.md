@@ -295,7 +295,7 @@ If you choose not to use VPN:
      ```yaml
      WIREGUARD_PRIVATE_KEY: your_private_key_here
      WIREGUARD_ADDRESSES: your_wireguard_address_here
-     SERVER_CITIES: los_angeles # Use lowercase with underscores, e.g., new_york, london, tokyo
+     SERVER_CITIES: Ashburn VA # Use proper case without underscores, e.g., Los Angeles, New York, London, Tokyo
      ```
 
 ### Launch and Initial Setup
