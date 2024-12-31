@@ -358,13 +358,12 @@ If you choose not to use VPN:
    - Configure authentication for Radarr, Sonarr, and other services
 
 4. **Configure Unpackerr**:
-   - After setting up Radarr and Sonarr, get their API keys:
-     1. In Radarr: Settings → General → Security → API Key
-     2. In Sonarr: Settings → General → Security → API Key
+   - After setting up Radarr and Sonarr, obtain their API keys from each application's settings:
+      - **Radarr/Sonarr**: Settings → General → Security → API Key
    - Update docker-compose.yml with the API keys:
      ```yaml
-     - UN_SONARR_0_API_KEY=your_sonarr_api_key_here
      - UN_RADARR_0_API_KEY=your_radarr_api_key_here
+     - UN_SONARR_0_API_KEY=your_sonarr_api_key_here
      ```
    - Update Unpackerr:
      ```bash
