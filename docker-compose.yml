@@ -124,21 +124,6 @@ services:
     volumes:
       - ./qbt/config:/config
       - /path/to/downloads:/downloads  # Replace with your downloads directory path
-    # Install RAR support and configure auto-extract
-    command: >
-      /bin/sh -c "
-      apk add --no-cache gcompat curl &&
-      cd /tmp &&
-      LATEST_RAR_URL=$(curl -s https://www.rarlab.com/download.htm | grep -o 'https://www.rarlab.com/rar/rarlinux-x64-[0-9].*tar.gz' | head -1) &&
-      echo 'Downloading latest RAR from:' $${LATEST_RAR_URL} &&
-      curl -fsSL $${LATEST_RAR_URL} -o rar.tar.gz &&
-      tar xf rar.tar.gz &&
-      cp rar/rar rar/unrar /usr/local/bin/ &&
-      chmod +x /usr/local/bin/rar /usr/local/bin/unrar &&
-      rm -rf rar rar.tar.gz &&
-      mkdir -p /defaults/qBittorrent &&
-      echo -e '[AutoRun]\nenabled=true\nprogram=unrar x -y -o+ \"%R\"/*.rar' > /defaults/qBittorrent/qBittorrent.conf &&
-      /init"
     network_mode: "service:gluetun"  # Routes all traffic through VPN
     # If not using VPN, remove the network_mode line above and uncomment these ports:
     # ports:
@@ -160,10 +145,10 @@ services:
       - TZ=America/New_York
       - VERSION=docker
       # Optional: Remove if not using GPU transcoding
-    #  - NVIDIA_VISIBLE_DEVICES=all####i#######
-    #  - NVIDIA_DRIVER_CAPABILITIES=computevideoutility
-    # devices:
-    #  - /dev/dri:/dev/dri  # GPU passthrough (remove if not using GPU transcoding)
+      - NVIDIA_VISIBLE_DEVICES=all####i#######
+      - NVIDIA_DRIVER_CAPABILITIES=computevideoutility
+     devices:
+      - /dev/dri:/dev/dri  # GPU passthrough (remove if not using GPU transcoding)
     volumes:
       - ./plex/config:/config
       - /path/to/media/movies:/media/movies  # Replace with your movies directory path
@@ -289,6 +274,32 @@ services:
       - ./organizr/config:/config
     ports:
       - 8096:80
+    restart: unless-stopped
+
+  # Automatic Extraction
+  # ------------------
+  # Monitors download clients and automatically extracts completed downloads
+  # NOTE: The API keys below can only be obtained AFTER setting up Sonarr and Radarr
+  # You will need to:
+  # 1. Start the stack without worrying about Unpackerr
+  # 2. Set up Sonarr and Radarr
+  # 3. Get their API keys from Settings → General → Security → API Key
+  # 4. Update these environment variables with the API keys
+  # 5. Start Unpackerr
+  unpackerr:
+    image: golift/unpackerr
+    container_name: unpackerr
+    environment:
+      - PUID=501
+      - PGID=20
+      - TZ=America/New_York
+      - UN_LOG_FILE=/downloads/unpackerr.log
+      - UN_SONARR_0_URL=http://sonarr:8989
+      - UN_SONARR_0_API_KEY=SONARR_API_HERE  # Get this from Sonarr after setup
+      - UN_RADARR_0_URL=http://radarr:7878
+      - UN_RADARR_0_API_KEY=RADARR_API_HERE  # Get this from Radarr after setup
+    volumes:
+      - /path/to/downloads:/downloads  # Replace with your downloads directory path
     restart: unless-stopped
 
   # System Monitoring

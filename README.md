@@ -44,6 +44,7 @@ A complete media server solution built on Docker technology. This stack provides
   - [Netdata](#netdata-port-19999)
   - [OpenSpeedTest](#openspeedtest-port-3000)
   - [SpeedTest-Tracker](#speedtest-tracker-port-8765)
+  - [Unpackerr](#unpackerr)
 - [How Everything Works Together](#how-everything-works-together)
 - [Port Reference](#port-reference)
 - [Updating](#updating)
@@ -85,7 +86,7 @@ This stack uses Docker Compose, a tool that helps you run multiple Docker contai
 4. Update paths in `docker-compose.yml` (see [Configuration](#configuration))
 5. Create the required directories:
    ```bash
-   mkdir -p {plex,radarr,sonarr,overseerr,tautulli,jackett,sabnzbd,organizr,monitorr,netdata,speedtest-tracker,qbt}/config backup
+   mkdir -p {plex,radarr,sonarr,overseerr,tautulli,jackett,sabnzbd,organizr,monitorr,netdata,speedtest-tracker,qbt,unpackerr}/config backup
    ```
 6. Start everything:
    ```bash
@@ -131,8 +132,13 @@ The media server stack is built with a microservices architecture where each com
 - **qBittorrent**: Torrent download manager
   - Runs through VPN tunnel (Gluetun)
   - Handles torrent downloads with encryption
-  - Includes automatic RAR extraction
   - Manages download queues and priorities
+
+- **Unpackerr**: Automatic extraction service
+  - Monitors download directories
+  - Extracts completed archives
+  - Integrates with Radarr/Sonarr
+  - Cleans up after extraction
 
 - **SABnzbd**: Usenet downloader
   - Handles Usenet binary downloads
@@ -309,7 +315,7 @@ If you choose not to use VPN:
 1. **Start the Stack**:
    ```bash
    # Create required directories
-   mkdir -p {plex,radarr,sonarr,overseerr,tautulli,jackett,sabnzbd,organizr,monitorr,netdata,speedtest-tracker,qbt}/config backup/config
+   mkdir -p {plex,radarr,sonarr,overseerr,tautulli,jackett,sabnzbd,organizr,monitorr,netdata,speedtest-tracker,qbt,unpackerr}/config backup/config
 
    # Start all services
    docker-compose up -d
@@ -562,11 +568,34 @@ If you choose not to use VPN:
 4. Set up notifications (optional)
 5. View historical speed test data
 
+### Unpackerr
+Note: This service requires Radarr and Sonarr to be set up first, as it needs their API keys to function.
+
+1. Set up Radarr and Sonarr first
+2. Get their API keys from:
+   - For Radarr: Settings → General → Security → API Key
+   - For Sonarr: Settings → General → Security → API Key
+3. Update the docker-compose.yml with your API keys:
+   ```yaml
+   - UN_SONARR_0_API_KEY=your_sonarr_api_key_here
+   - UN_RADARR_0_API_KEY=your_radarr_api_key_here
+   ```
+4. Start Unpackerr service:
+   ```bash
+   docker-compose up -d unpackerr
+   ```
+5. Unpackerr will automatically:
+   - Monitor your download directory
+   - Extract completed downloads
+   - Clean up archive files
+   - Notify Radarr/Sonarr when extraction is complete
+
 ## Port Reference
 
 | Service           | Port  | Notes                               |
 |-------------------|-------|-------------------------------------|
 | Plex              | 32400 | Media streaming                     |
+| Unpackerr         | -     | Automatic extraction service        |
 | Radarr            | 7878  | Movie management                    |
 | Sonarr            | 8989  | TV show management                  |
 | Overseerr         | 5055  | Request management                  |
