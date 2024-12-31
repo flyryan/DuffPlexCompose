@@ -118,8 +118,8 @@ services:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
     environment:
-      - PUID=501  # User ID
-      - PGID=20   # Group ID
+      - PUID=1000  # User ID
+      - PGID=1000  # Group ID
       - TZ=America/New_York
     volumes:
       - ./qbt/config:/config
@@ -140,14 +140,13 @@ services:
     container_name: plex
     network_mode: bridge
     environment:
-      - PUID=501
-      - PGID=20
+      - PUID=1000
+      - PGID=1000
       - TZ=America/New_York
       - VERSION=docker
-      # Optional: Remove if not using GPU transcoding
-      - NVIDIA_VISIBLE_DEVICES=all####i#######
-      - NVIDIA_DRIVER_CAPABILITIES=computevideoutility
-     devices:
+      - NVIDIA_VISIBLE_DEVICES=all####i#######  # Optional: Remove if not using GPU transcoding
+      - NVIDIA_DRIVER_CAPABILITIES=computevideoutility  # Optional: Remove if not using GPU transcoding
+    devices:
       - /dev/dri:/dev/dri  # GPU passthrough (remove if not using GPU transcoding)
     volumes:
       - ./plex/config:/config
@@ -164,8 +163,8 @@ services:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
     environment:
-      - PUID=501
-      - PGID=20
+      - PUID=1000
+      - PGID=1000
       - TZ=America/New_York
     volumes:
       - ./radarr/config:/config
@@ -182,8 +181,8 @@ services:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
     environment:
-      - PUID=501
-      - PGID=20
+      - PUID=1000
+      - PGID=1000
       - TZ=America/New_York
     volumes:
       - ./sonarr/config:/config
@@ -200,8 +199,8 @@ services:
     image: lscr.io/linuxserver/overseerr:latest
     container_name: overseerr
     environment:
-      - PUID=501
-      - PGID=20
+      - PUID=1000
+      - PGID=1000
       - TZ=America/New_York
     volumes:
       - ./overseerr/config:/config
@@ -216,8 +215,8 @@ services:
     image: lscr.io/linuxserver/tautulli:latest
     container_name: tautulli
     environment:
-      - PUID=501
-      - PGID=20
+      - PUID=1000
+      - PGID=1000
       - TZ=America/New_York
     volumes:
       - ./tautulli/config:/config
@@ -232,8 +231,8 @@ services:
     image: lscr.io/linuxserver/jackett:latest
     container_name: jackett
     environment:
-      - PUID=501
-      - PGID=20
+      - PUID=1000
+      - PGID=1000
       - TZ=America/New_York
       - AUTO_UPDATE=true
     volumes:
@@ -250,8 +249,8 @@ services:
     image: lscr.io/linuxserver/sabnzbd:latest
     container_name: sabnzbd
     environment:
-      - PUID=501
-      - PGID=20
+      - PUID=1000
+      - PGID=1000
       - TZ=America/New_York
     volumes:
       - ./sabnzbd/config:/config
@@ -267,8 +266,8 @@ services:
     image: organizr/organizr:latest
     container_name: organizr
     environment:
-      - PUID=501
-      - PGID=20
+      - PUID=1000
+      - PGID=1000
       - TZ=America/New_York
     volumes:
       - ./organizr/config:/config
@@ -290,8 +289,8 @@ services:
     image: golift/unpackerr
     container_name: unpackerr
     environment:
-      - PUID=501
-      - PGID=20
+      - PUID=1000
+      - PGID=1000
       - TZ=America/New_York
       - UN_LOG_FILE=/downloads/unpackerr.log
       - UN_SONARR_0_URL=http://sonarr:8989
@@ -309,8 +308,8 @@ services:
     image: monitorr/monitorr:latest
     container_name: monitorr
     environment:
-      - PUID=501
-      - PGID=20
+      - PUID=1000
+      - PGID=1000
       - TZ=America/New_York
     volumes:
       - ./monitorr/app:/app
@@ -364,8 +363,8 @@ services:
       - ./speedtest-tracker/config:/config
     environment:
       - TZ=America/New_York
-      - PGID=20
-      - PUID=501
+      - PGID=1000
+      - PUID=1000
       - AUTH=true
       - OOKLA_EULA_GDPR=true
     logging:

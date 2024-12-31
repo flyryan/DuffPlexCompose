@@ -357,7 +357,26 @@ If you choose not to use VPN:
    - Set secure passwords for all services
    - Configure authentication for Radarr, Sonarr, and other services
 
-4. **Post-Launch Configuration**:
+4. **Configure Unpackerr**:
+   - After setting up Radarr and Sonarr, get their API keys:
+     1. In Radarr: Settings → General → Security → API Key
+     2. In Sonarr: Settings → General → Security → API Key
+   - Update docker-compose.yml with the API keys:
+     ```yaml
+     - UN_SONARR_0_API_KEY=your_sonarr_api_key_here
+     - UN_RADARR_0_API_KEY=your_radarr_api_key_here
+     ```
+   - Update Unpackerr:
+     ```bash
+     docker-compose up -d unpackerr
+     ```
+   - Unpackerr will now automatically:
+     - Monitor your downloads directory
+     - Extract completed downloads
+     - Clean up archive files
+     - Notify Radarr/Sonarr when extraction is complete
+
+5. **Post-Launch Configuration**:
    - Configure Plex libraries and media paths
    - Set up Radarr/Sonarr quality profiles
    - Configure Jackett indexers
