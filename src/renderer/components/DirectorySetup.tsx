@@ -100,23 +100,23 @@ const DirectorySetup: React.FC = () => {
     },
   });
 
+  type NestedKey = 'media.movies' | 'media.tv' | 'media.music' | 'downloads.incomplete' | 'downloads.complete' | 'backup' | 'config';
+
+  const getNestedValue = (obj: any, path: string) => {
+    const parts = path.split('.');
+    return parts.reduce((acc, part) => (acc ? acc[part] : undefined), obj);
+  };
+
   const renderDirectoryInput = (
-    fieldName: string,
+    fieldName: NestedKey,
     label: string,
     helperText: string,
     optional: boolean = false,
     placeholder?: string
   ) => {
-    const [parent, child] = fieldName.split('.') as [keyof FormValues, string];
-    const touched = child
-      ? formik.touched[parent]?.[child]
-      : formik.touched[parent];
-    const error = child
-      ? formik.errors[parent]?.[child]
-      : formik.errors[parent];
-    const value = child
-      ? formik.values[parent][child]
-      : formik.values[parent as keyof FormValues];
+    const touched = getNestedValue(formik.touched, fieldName);
+    const error = getNestedValue(formik.errors, fieldName) as string | undefined;
+    const value = getNestedValue(formik.values, fieldName) as string;
 
     return (
       <FormControl isInvalid={touched && !!error}>

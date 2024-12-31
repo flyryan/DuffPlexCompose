@@ -3,14 +3,17 @@
   "version": "1.0.0",
   "description": "Interactive wizard for deploying media server stack with Docker",
   "main": "dist/main/main.js",
+  "bin": {
+    "media-server-wizard": "dist/cli/index.js"
+  },
+  "type": "module",
   "scripts": {
     "dev": "concurrently -k \"cross-env BROWSER=none npm run dev:vite\" \"npm run dev:electron\"",
     "dev:vite": "vite",
     "dev:electron": "wait-on tcp:3000 -t 30000 && tsc -p tsconfig.node.json && cross-env NODE_ENV=development electron .",
-    "build": "npm run clean && npm run build:vite && npm run build:electron",
+    "build": "npm run clean && npx tsc -p tsconfig.shared.json && npx tsc -b tsconfig.node.json tsconfig.cli.json && npm run build:vite && npm run copy-preload",
     "build:vite": "tsc && vite build",
-    "build:electron": "tsc -p tsconfig.node.json && npm run copy-preload",
-    "copy-preload": "cp dist/main/preload.js dist/main/preload.js",
+    "copy-preload": "cp dist/main/main/preload.js dist/preload.js",
     "preview": "vite preview",
     "package": "npm run build && electron-builder build --mac --win --linux",
     "package:dir": "npm run build && electron-builder build --dir",
@@ -20,19 +23,25 @@
     "clean": "rimraf dist build",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
-    "test": "jest"
+    "test": "jest",
+    "cli": "node dist/cli/cli/index.js"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
+    "chalk": "^5.4.1",
+    "commander": "^13.0.0",
     "dockerode": "^4.0.0",
     "electron-is-dev": "^2.0.0",
     "formik": "^2.4.5",
     "framer-motion": "^10.17.9",
     "fs-extra": "^11.2.0",
+    "inquirer": "^12.3.0",
+    "listr": "^0.14.3",
     "lru-cache": "^10.1.0",
+    "ora": "^8.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.21.1",
@@ -43,6 +52,7 @@
     "@types/dockerode": "^3.3.23",
     "@types/fs-extra": "^11.0.4",
     "@types/jest": "^29.5.11",
+    "@types/listr": "^0.14.9",
     "@types/node": "^20.10.6",
     "@types/react": "^18.2.46",
     "@types/react-dom": "^18.2.18",
@@ -62,7 +72,7 @@
     "prettier": "^3.1.1",
     "rimraf": "^5.0.5",
     "ts-jest": "^29.1.1",
-    "typescript": "^5.3.3",
+    "typescript": "^5.7.2",
     "vite": "^5.0.10",
     "wait-on": "^7.2.0"
   },
@@ -78,13 +88,23 @@
     ],
     "mac": {
       "category": "public.app-category.utilities",
-      "target": ["dmg", "zip"]
+      "target": [
+        "dmg",
+        "zip"
+      ]
     },
     "win": {
-      "target": ["nsis", "portable"]
+      "target": [
+        "nsis",
+        "portable"
+      ]
     },
     "linux": {
-      "target": ["AppImage", "deb", "rpm"],
+      "target": [
+        "AppImage",
+        "deb",
+        "rpm"
+      ],
       "category": "Utility"
     }
   }

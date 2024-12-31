@@ -17,7 +17,7 @@ import {
   ButtonGroup,
 } from '@chakra-ui/react';
 import { useWizard } from '../context/WizardContext';
-import yaml, { Document } from 'yaml';
+import yaml from 'yaml';
 
 type ServiceName = 'plex' | 'gluetun' | 'qbittorrent' | 'transmission' | 'radarr' | 'sonarr' | 'overseerr' | 'ombi';
 

@@ -1,34 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 
-interface DirectoryConfig {
-  media: {
-    movies?: string;
-    tv?: string;
-    music?: string;
-  };
-  downloads: {
-    incomplete?: string;
-    complete?: string;
-  };
-  backup: string;
-  config: string;
-}
-
-interface ServiceConfig {
-  required: {
-    mediaServer: 'plex';
-    vpn: 'gluetun';
-    downloadClient: 'qbittorrent' | 'transmission';
-  };
-  optional: {
-    movieManager?: 'radarr';
-    tvManager?: 'sonarr';
-    requestSystem?: 'overseerr' | 'ombi';
-  };
-  features?: {
-    qbtRarSupport?: boolean;
-  };
-}
+import { DirectoryConfig, ServiceSelection as ServiceConfig } from '@shared/types';
 
 interface WizardContextType {
   directories: DirectoryConfig | null;
