@@ -373,12 +373,12 @@ If you choose not to use VPN:
 5. **Backup Configuration**:
    ```bash
    # Create backup directory
-   mkdir -p backup
+   sudo mkdir -p backup
    ```
 
    ```bash
    # Backup all config directories, excluding Plex cache/transcoding data
-   tar -czf backup/config_backup_$(date +%Y%m%d).tar.gz \
+   sudo tar -czf backup/config_backup_$(date +%Y%m%d).tar.gz \
      --exclude='plex/config/Library/Application Support/Plex Media Server/Media' \
      --exclude='plex/config/Library/Application Support/Plex Media Server/Cache' \
      --exclude='plex/config/Library/Application Support/Plex Media Server/Metadata' \
@@ -392,7 +392,7 @@ If you choose not to use VPN:
 
    Then use this alternative command with progress bar showing total size and time remaining:
    ```bash
-   tar -czf - --exclude='plex/config/Library/Application Support/Plex Media Server/Media' --exclude='plex/config/Library/Application Support/Plex Media Server/Cache' --exclude='plex/config/Library/Application Support/Plex Media Server/Metadata' */config 2>/dev/null | pv -s $(tar -cf - --exclude='plex/config/Library/Application Support/Plex Media Server/Media' --exclude='plex/config/Library/Application Support/Plex Media Server/Cache' --exclude='plex/config/Library/Application Support/Plex Media Server/Metadata' */config 2>/dev/null | wc -c) > backup/config_backup_$(date +%Y%m%d).tar.gz
+   sudo tar -czf - --exclude='plex/config/Library/Application Support/Plex Media Server/Media' --exclude='plex/config/Library/Application Support/Plex Media Server/Cache' --exclude='plex/config/Library/Application Support/Plex Media Server/Metadata' */config 2>/dev/null | pv -s $(tar -cf - --exclude='plex/config/Library/Application Support/Plex Media Server/Media' --exclude='plex/config/Library/Application Support/Plex Media Server/Cache' --exclude='plex/config/Library/Application Support/Plex Media Server/Metadata' */config 2>/dev/null | wc -c) > backup/config_backup_$(date +%Y%m%d).tar.gz
    ```
 
 6. **Restore Configuration**:
@@ -403,21 +403,21 @@ If you choose not to use VPN:
    docker-compose down
 
    # Remove existing config directories (optional, but prevents conflicts)
-   rm -rf */config
+   sudo rm -rf */config
 
    # Restore from backup (with progress bar)
-   pv backup/config_backup_YYYYMMDD.tar.gz | tar -xzf - -C .
+   sudo pv backup/config_backup_YYYYMMDD.tar.gz | sudo tar -xzvf - -C .
    ```
    
    Or without progress bar:
    ```bash
-   tar -xzf backup/config_backup_YYYYMMDD.tar.gz -C .
+   sudo tar -xzf backup/config_backup_YYYYMMDD.tar.gz -C .
    ```
 
    After restoring:
    ```bash
    # Fix permissions if needed
-   chown -R $PUID:$PGID */config
+   sudo chown -R $PUID:$PGID */config
 
    # Start all services
    docker-compose up -d
