@@ -256,7 +256,7 @@ This stack can optionally use Mullvad VPN to protect your privacy when downloadi
 1. Sign up at [Mullvad VPN](https://mullvad.net)
 
 2. Generate a WireGuard configuration:
-   - Go to [Mullvad Account](https://mullvad.net/en/account/#/wireguard-config)
+   - Go to [Mullvad Account](https://mullvad.net/en/account/wireguard-config)
    - Select "Linux" as your platform
    - Generate a new key
    - Download the configuration file
