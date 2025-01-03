@@ -460,7 +460,7 @@ If you choose not to use VPN:
 ### Radarr (Port 7878)
 
 1. Access Radarr at `http://localhost:7878`
-2. Use the password you set (never use temporary passwords)
+2. Set your password
 3. Add root folder: `/movies`
 4. Configure quality profiles
 5. Add indexers (via Jackett)
@@ -471,7 +471,7 @@ If you choose not to use VPN:
 ### Sonarr (Port 8989)
 
 1. Access Sonarr at `http://localhost:8989`
-2. Use the password you set (never use temporary passwords)
+2. Set your password
 3. Add root folder: `/tv`
 4. Configure quality profiles
 5. Add indexers (via Jackett)
