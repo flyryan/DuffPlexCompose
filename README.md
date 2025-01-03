@@ -4,7 +4,7 @@ A complete media server solution built on Docker technology. This stack provides
 
 ## Quick Navigation
 - [Quick Start](#quick-start)
-- [Architecture Overview](#architecture-overview)
+- [Detailed Setup Guide](#detailed-setup-guide)
 - [Configuration](#configuration)
 - [Service Setup](#service-configuration-guide)
 - [Port Reference](#port-reference)
