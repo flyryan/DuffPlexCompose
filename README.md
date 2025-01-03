@@ -13,7 +13,6 @@ A complete media server solution built on Docker technology. This stack provides
 ## Table of Contents
 
 - [What is Docker?](#what-is-docker)
-- [Why Docker?](#why-docker)
 - [Quick Start](#quick-start)
 - [Architecture Overview](#architecture-overview)
   - [Core Components](#core-components)
@@ -53,10 +52,9 @@ A complete media server solution built on Docker technology. This stack provides
 
 ## What is Docker?
 
-Docker is a platform that makes it easy to run applications in isolated containers. Think of containers as lightweight, standalone packages that include everything needed to run a piece of software.
+Docker is a platform that makes it easy to run applications in isolated containers - lightweight, standalone packages that include everything needed to run a piece of software. This stack uses Docker Compose, a tool that helps you run multiple Docker containers together.
 
-## Why Docker?
-
+Key benefits of using Docker for this media server stack:
 - **Easy Setup**: No need to manually install each application
 - **No Conflicts**: Each service runs in its own container, preventing conflicts
 - **Simple Updates**: Update any service with just two commands
@@ -65,7 +63,7 @@ Docker is a platform that makes it easy to run applications in isolated containe
 - **Easy Backup**: All configurations are in one place
 - **Quick Recovery**: If something breaks, just restart the container
 
-This stack uses Docker Compose, a tool that helps you run multiple Docker containers together. Instead of managing each service separately, you can start/stop/update everything with single commands.
+Instead of managing each service separately, you can start/stop/update everything with single commands.
 
 ---
 
